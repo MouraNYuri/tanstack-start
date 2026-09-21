@@ -1,17 +1,16 @@
-# Multi-stage build com Bun
+# Estágio de Build
 FROM oven/bun:1-alpine AS builder
 
 WORKDIR /app
 
-# Copia manifestos e lockfiles
+# Copia manifestos e instala dependências
 COPY package.json bun.lock* ./
-
-# Instala dependências de forma congelada
 RUN bun install --frozen-lockfile
 
+# Copia o código-fonte
 COPY . .
 
-# Executa o build do TanStack Start
+# Executa o build de produção do TanStack Start
 RUN bun run build
 
 # --- Estágio de Execução ---
@@ -22,11 +21,13 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PORT=3000
 
-# Copia os arquivos gerados pelo build do TanStack Start / Vinxi
-COPY --from=builder /app/.output ./.output
+# 1. Copia o diretório compilado correto gerado pelo TanStack Start
+COPY --from=builder /app/.tanstack ./.tanstack
 COPY --from=builder /app/package.json ./
+# Copia as node_modules necessárias para produção
+COPY --from=builder /app/node_modules ./node_modules
 
 EXPOSE 3000
 
-# Inicia a aplicação usando Bun
-CMD ["bun", "run", ".output/server/index.mjs"]
+# 2. Executa a aplicação apontando para o bundle de produção do TanStack Start
+CMD ["bun", ".tanstack/start/build/server/index.js"]
