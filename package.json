@@ -9,6 +9,7 @@
     "dev": "vite dev --port 3000 --host",
     "generate-routes": "tsr generate",
     "build": "vite build",
+    "start": "bun run dist/server/index.js",
     "preview": "vite preview",
     "format": "biome format",
     "lint": "biome lint",
