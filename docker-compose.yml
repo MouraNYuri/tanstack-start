@@ -11,7 +11,7 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U myuser -d mydatabase"]
+      test: ['CMD-SHELL', 'pg_isready -U myuser -d mydatabase']
       interval: 5s
       timeout: 5s
       retries: 5
@@ -43,8 +43,8 @@ services:
     container_name: nginx_proxy
     restart: always
     ports:
-      - "80:80"
-      - "443:443"
+      - '80:80'
+      - '443:443'
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
       # Mapeia os assets compilados diretamente no diretório do Nginx

@@ -12,10 +12,7 @@ export const createUserSchema = createInsertSchema(users, {
     .max(100, 'O nome deve ter no máximo 100 caracteres')
     .toUpperCase(),
 
-  email: z
-    .email({error: 'Endereço de e-mail inválido'})
-    .trim()
-    .toLowerCase(),
+  email: z.email({ error: 'Endereço de e-mail inválido' }).trim().toLowerCase(),
 
   password: z
     .string({ error: 'A senha é obrigatória' })

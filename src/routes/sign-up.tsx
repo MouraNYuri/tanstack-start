@@ -1,4 +1,4 @@
-import { GalleryVerticalEnd } from "lucide-react"
+import { GalleryVerticalEnd } from 'lucide-react'
 import { SignupForm } from '#/components/features/sign-up-form'
 import { createFileRoute } from '@tanstack/react-router'
 

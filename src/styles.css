@@ -6,10 +6,10 @@
 @import 'shadcn/tailwind.css';
 @import '@fontsource-variable/noto-sans';
 @import '@fontsource-variable/eb-garamond';
-@import "tw-animate-css";
-@import "shadcn/tailwind.css";
-@import "@fontsource-variable/noto-sans";
-@import "@fontsource-variable/eb-garamond";
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@import '@fontsource-variable/noto-sans';
+@import '@fontsource-variable/eb-garamond';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -141,7 +141,8 @@ body,
   body {
     @apply font-sans bg-background text-foreground;
   }
-  button:not(:disabled), [role="button"]:not(:disabled) {
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
     cursor: pointer;
   }
   html {

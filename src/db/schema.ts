@@ -1,10 +1,19 @@
-import { bigint, index, pgTable, text, timestamp, uuid } from 'drizzle-orm/pg-core'
+import {
+  bigint,
+  index,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from 'drizzle-orm/pg-core'
 
 export const users = pgTable(
   'users',
   {
     // ID Privado (Primary Key interna para JOINs e relacionamentos no banco)
-    id: bigint('id', { mode: 'number' }).primaryKey().generatedAlwaysAsIdentity(),
+    id: bigint('id', { mode: 'number' })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
 
     // ID Público (Exposto em URLs, APIs e no Frontend)
     publicId: uuid('public_id').defaultRandom().unique().notNull(),
@@ -24,5 +33,5 @@ export const users = pgTable(
   (table) => [
     // Índice para garantir buscas ultra rápidas por ID público na API
     index('users_public_id_idx').on(table.publicId),
-  ]
+  ],
 )

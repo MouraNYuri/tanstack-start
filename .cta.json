@@ -17,11 +17,5 @@
   "routerOnly": false,
   "version": 1,
   "framework": "react",
-  "chosenAddOns": [
-    "biome",
-    "drizzle",
-    "compiler",
-    "shadcn",
-    "tanstack-query"
-  ]
+  "chosenAddOns": ["eslint", "compiler", "drizzle", "shadcn", "tanstack-query"]
 }
