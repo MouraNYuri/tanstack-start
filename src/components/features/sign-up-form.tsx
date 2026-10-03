@@ -33,7 +33,6 @@ export function SignupForm({
     defaultValues: {
       name: '',
       email: '',
-      password: '',
     },
   })
 
@@ -74,7 +73,7 @@ export function SignupForm({
                 <Input
                   id="name"
                   type="text"
-                  placeholder="John Doe"
+                  placeholder="John Nolan"
                   {...form.register('name')} // 3. Registra o input
                 />
                 {form.formState.errors.name && (
@@ -88,29 +87,11 @@ export function SignupForm({
                 <Input
                   id="email"
                   type="email"
-                  placeholder="m@example.com"
+                  placeholder="email@example.com"
                   {...form.register('email')} // 3. Registra o input
                 />
                 {form.formState.errors.email && (
                   <FieldError>{form.formState.errors.email.message}</FieldError>
-                )}
-              </Field>
-
-              {/* Campo: Password */}
-              <Field>
-                <FieldLabel htmlFor="password">Password</FieldLabel>
-                <Input
-                  id="password"
-                  type="password"
-                  {...form.register('password')} // 3. Registra o input
-                />
-                <FieldDescription>
-                  Must be at least 8 characters long.
-                </FieldDescription>
-                {form.formState.errors.password && (
-                  <FieldError>
-                    {form.formState.errors.password.message}
-                  </FieldError>
                 )}
               </Field>
 

@@ -15,6 +15,13 @@
       "when": 1789782247735,
       "tag": "0001_tricky_callisto",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1790990054685,
+      "tag": "0002_cute_echo",
+      "breakpoints": true
     }
   ]
 }
