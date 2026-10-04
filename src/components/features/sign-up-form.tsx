@@ -1,7 +1,7 @@
 import { cn } from 'cn'
 
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod' // Adicione o resolver
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import {
@@ -14,7 +14,7 @@ import {
 import {
   Field,
   FieldDescription,
-  FieldError, // Adicionado para exibir mensagens do form.setError
+  FieldError,
   FieldGroup,
   FieldLabel,
 } from '@/components/ui/field'
@@ -22,12 +22,12 @@ import { Input } from '@/components/ui/input'
 import { createUserFn } from '#/services/users'
 import { createUserSchema } from '#/schemas/users'
 import type { CreateUserInput } from '#/schemas/users'
+import { Link } from '@tanstack/react-router'
 
-export function SignupForm({
+export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  // 1. Passe o schema do Zod no useForm para validação no client side
   const form = useForm<CreateUserInput>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
@@ -41,7 +41,6 @@ export function SignupForm({
 
     if (!result.success) {
       if (result.field) {
-        // Mapeia o erro devolvido pelo servidor diretamente no campo (ex: email)
         form.setError(result.field as keyof CreateUserInput, {
           message: result.error,
         })
@@ -51,59 +50,62 @@ export function SignupForm({
       return
     }
 
-    toast.success(`Usuário ${result.data.name} criado com sucesso!`)
+    toast.success(`Conta criada com sucesso para ${result.data.name}!`)
   }
 
   return (
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className="text-center">
-          <CardTitle className="text-xl">Create your account</CardTitle>
+          <CardTitle className="text-xl">Crie sua conta</CardTitle>
           <CardDescription>
-            Enter your email below to create your account
+            Preencha seus dados abaixo para começar a usar a plataforma
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/* 2. O onSubmit entra AQUI envolvido por form.handleSubmit */}
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <FieldGroup>
-              {/* Campo: Name */}
+              {/* Campo: Nome Completo */}
               <Field>
-                <FieldLabel htmlFor="name">Full Name</FieldLabel>
+                <FieldLabel htmlFor="name">Nome completo</FieldLabel>
                 <Input
                   id="name"
                   type="text"
-                  placeholder="John Nolan"
-                  {...form.register('name')} // 3. Registra o input
+                  placeholder="Seu nome completo"
+                  {...form.register('name')}
                 />
                 {form.formState.errors.name && (
                   <FieldError>{form.formState.errors.name.message}</FieldError>
                 )}
               </Field>
 
-              {/* Campo: Email */}
+              {/* Campo: E-mail */}
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">E-mail</FieldLabel>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="email@example.com"
-                  {...form.register('email')} // 3. Registra o input
+                  placeholder="seu.email@exemplo.com"
+                  {...form.register('email')}
                 />
                 {form.formState.errors.email && (
                   <FieldError>{form.formState.errors.email.message}</FieldError>
                 )}
               </Field>
 
+              {/* Ação de Submissão */}
               <Field>
-                {/* 4. O botão dispara o submit e desabilita enquanto processa */}
-                <Button type="submit" disabled={form.formState.isSubmitting}>
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={form.formState.isSubmitting}
+                >
                   {form.formState.isSubmitting
-                    ? 'Creating...'
-                    : 'Create Account'}
+                    ? 'Criando conta...'
+                    : 'Criar conta'}
                 </Button>
-                <FieldDescription className="text-center">
-                  Already have an account? <a href="#">Sign in</a>
+                <FieldDescription className="text-center mt-2">
+                  Já tem uma conta? <Link to="/sign-in">Fazer login</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>
@@ -111,8 +113,8 @@ export function SignupForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
-        and <a href="#">Privacy Policy</a>.
+        Ao continuar, você concorda com nossos <a href="#">Termos de Serviço</a>{' '}
+        e <a href="#">Política de Privacidade</a>.
       </FieldDescription>
     </div>
   )

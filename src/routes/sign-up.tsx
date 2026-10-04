@@ -1,5 +1,5 @@
 import { GalleryVerticalEnd } from 'lucide-react'
-import { SignupForm } from '#/components/features/sign-up-form'
+import { SignUpForm } from '#/components/features/sign-up-form'
 import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/sign-up')({ component: SignUpPage })
@@ -14,7 +14,7 @@ function SignUpPage() {
           </div>
           Acme Inc.
         </a>
-        <SignupForm />
+        <SignUpForm />
       </div>
     </div>
   )

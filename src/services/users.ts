@@ -1,20 +1,24 @@
 import { createServerFn } from '@tanstack/react-start'
-import { createUser, userExists } from '#/repositories/users'
-import { createUserSchema, selectUserSchema } from '#/schemas/users'
+import { createUser, findUserByEmail, userExists } from '#/repositories/users'
+import {
+  createUserSchema,
+  emailSchema,
+  selectUserSchema,
+  signInUserSchema,
+} from '#/schemas/users'
 import type { UserResponse } from '#/schemas/users'
 import type { ActionResult } from '#/types/action-result'
+import { EmailProvider } from '#/providers/email'
+import { createHtml } from '#/helpers/create-html'
+import { CacheProvider } from '#/providers/cache'
 
 export const createUserFn = createServerFn({ method: 'POST' })
   .validator((data: unknown) => createUserSchema.parse(data))
   .handler(
-    async ({
-      data: { email, name },
-    }): Promise<ActionResult<UserResponse>> => {
-      // 1. Verificação de regra de negócio
+    async ({ data: { email, name } }): Promise<ActionResult<UserResponse>> => {
       const userAlreadyExist = await userExists(email)
 
       if (userAlreadyExist) {
-        // Retorno imediato sem chamar o selectUserSchema
         return {
           success: false,
           error: 'E-mail já cadastrado no sistema.',
@@ -22,16 +26,81 @@ export const createUserFn = createServerFn({ method: 'POST' })
         }
       }
 
-      // 2. Inserção no banco
       const newUser = await createUser({
         email,
         name,
       })
 
-      // 3. Retorno de sucesso (valida APENAS o usuário criado)
       return {
         success: true,
         data: selectUserSchema.parse(newUser),
+      }
+    },
+  )
+
+export const verifyEmailFn = createServerFn({ method: 'POST' })
+  .validator((data: unknown) => emailSchema.parse(data))
+  .handler(async ({ data: email }): Promise<ActionResult<string>> => {
+    const verificationCode = Math.floor(
+      100000 + Math.random() * 900000,
+    ).toString()
+
+    const verificationCodeExpires = new Date(Date.now() + 5 * 60000)
+
+    const cacheProvider = new CacheProvider()
+
+    await cacheProvider.set(email, verificationCode, verificationCodeExpires)
+
+    const emailProvider = new EmailProvider()
+
+    await emailProvider.send(
+      email,
+      'Confirme seu Email',
+      createHtml(verificationCode),
+    )
+
+    return {
+      success: true,
+      data: 'Código enviado com sucesso!',
+    }
+  })
+
+export const signInUserFn = createServerFn({ method: 'POST' })
+  .validator((data: unknown) => signInUserSchema.parse(data))
+  .handler(
+    async ({ data: { email, otp } }): Promise<ActionResult<UserResponse>> => {
+      const cacheProvider = new CacheProvider()
+
+      const thereAVerificationCode = await cacheProvider.get(email)
+
+      if (!thereAVerificationCode) {
+        return {
+          success: false,
+          error: 'Não existe um código de verificação para esse email',
+          field: 'email',
+        }
+      }
+
+      const verificationCodesAreEquals = thereAVerificationCode.value === otp
+
+      if (
+        !verificationCodesAreEquals ||
+        thereAVerificationCode.expires < new Date()
+      ) {
+        return {
+          success: false,
+          error: 'Código de verificação incorreto ou expirado',
+          field: 'email',
+        }
+      }
+
+      await cacheProvider.delete(email)
+
+      const user = await findUserByEmail(email)
+
+      return {
+        success: true,
+        data: selectUserSchema.parse(user),
       }
     },
   )
