@@ -1,4 +1,5 @@
 import { createServerFn } from '@tanstack/react-start'
+import { setCookie } from '@tanstack/react-start/server'
 import { createUser, findUserByEmail, userExists } from '#/repositories/users'
 import {
   createUserSchema,
@@ -11,6 +12,7 @@ import type { ActionResult } from '#/types/action-result'
 import { EmailProvider } from '#/providers/email'
 import { createHtml } from '#/helpers/create-html'
 import { CacheProvider } from '#/providers/cache'
+import { JwtProvider } from '#/providers/jwt'
 
 export const createUserFn = createServerFn({ method: 'POST' })
   .validator((data: unknown) => createUserSchema.parse(data))
@@ -31,6 +33,20 @@ export const createUserFn = createServerFn({ method: 'POST' })
         name,
       })
 
+      const jwtProvider = new JwtProvider()
+
+      const token = await jwtProvider.sign(
+        { publicId: newUser.publicId },
+      )
+
+      setCookie('session_token', token, {
+        httpOnly: true,   
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 1,
+      })
+
       return {
         success: true,
         data: selectUserSchema.parse(newUser),
@@ -41,6 +57,16 @@ export const createUserFn = createServerFn({ method: 'POST' })
 export const verifyEmailFn = createServerFn({ method: 'POST' })
   .validator((data: unknown) => emailSchema.parse(data))
   .handler(async ({ data: email }): Promise<ActionResult<string>> => {
+    const user = userExists(email)
+
+    if (!user) {
+        return {
+          success: false,
+          error: 'E-mail não cadastrado no sistema.',
+          field: 'email',
+        }
+      }
+
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000,
     ).toString()
@@ -55,7 +81,7 @@ export const verifyEmailFn = createServerFn({ method: 'POST' })
 
     await emailProvider.send(
       email,
-      'Confirme seu Email',
+      'Confirme seu e-mail',
       createHtml(verificationCode),
     )
 
@@ -76,7 +102,7 @@ export const signInUserFn = createServerFn({ method: 'POST' })
       if (!thereAVerificationCode) {
         return {
           success: false,
-          error: 'Não existe um código de verificação para esse email',
+          error: 'Não existe um código de verificação para esse e-mail',
           field: 'email',
         }
       }
@@ -97,6 +123,28 @@ export const signInUserFn = createServerFn({ method: 'POST' })
       await cacheProvider.delete(email)
 
       const user = await findUserByEmail(email)
+
+      if (!user) {
+        return {
+          success: false,
+          error: 'E-mail não cadastrado no sistema.',
+          field: 'email',
+        }
+      }
+
+      const jwtProvider = new JwtProvider()
+
+      const token = await jwtProvider.sign(
+        { publicId: user.publicId },
+      )
+
+      setCookie('session_token', token, {
+        httpOnly: true,   
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 1,
+      })
 
       return {
         success: true,

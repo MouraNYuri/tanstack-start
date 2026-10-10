@@ -27,6 +27,9 @@ export const createUserSchema = createInsertSchema(users, {
 // Schema para Seleção/Retorno (Resposta para o Frontend)
 export const selectUserSchema = createSelectSchema(users).omit({
   id: true, // NUNCA expõe o ID primário privado
+  publicId: true,
+  createdAt: true,
+  updatedAt: true,
 })
 
 export const signInUserSchema = z.object({
