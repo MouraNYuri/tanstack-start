@@ -2,8 +2,8 @@ import { userQueryOptions } from '#/queries/user'
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { GalleryVerticalEnd } from 'lucide-react'
 
-export const Route = createFileRoute('/auth')({
-  beforeLoad: async ({ context, location }) => {
+export const Route = createFileRoute('/_authLayout')({
+  beforeLoad: async ({ context }) => {
     const result = await context.queryClient.query(
       userQueryOptions,
     )
@@ -11,9 +11,6 @@ export const Route = createFileRoute('/auth')({
     if (result.success) {
       throw redirect({
         to: '/',
-        search: {
-          redirect: location.href
-        }
       })
     }
 
