@@ -15,8 +15,8 @@ export async function createUser(data: CreateUserInput) {
   return newUser
 }
 
-export async function findUserByEmail(email: string) {
-  return db.query.users.findFirst({ where: eq(users.email, email) })
+export async function findUserBy(where: 'email' | 'publicId', value: string) {
+  return db.query.users.findFirst({ where: eq(users[where], value) })
 }
 
 export async function userExists(email: string) {

@@ -1,6 +1,6 @@
 import { createServerFn } from '@tanstack/react-start'
-import { setCookie } from '@tanstack/react-start/server'
-import { createUser, findUserByEmail, userExists } from '#/repositories/users'
+import { setCookie, getCookie } from '@tanstack/react-start/server'
+import { createUser, findUserBy, userExists } from '#/repositories/users'
 import {
   createUserSchema,
   emailSchema,
@@ -35,12 +35,10 @@ export const createUserFn = createServerFn({ method: 'POST' })
 
       const jwtProvider = new JwtProvider()
 
-      const token = await jwtProvider.sign(
-        { publicId: newUser.publicId },
-      )
+      const token = await jwtProvider.sign({ publicId: newUser.publicId })
 
       setCookie('session_token', token, {
-        httpOnly: true,   
+        httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/',
@@ -60,12 +58,12 @@ export const verifyEmailFn = createServerFn({ method: 'POST' })
     const user = userExists(email)
 
     if (!user) {
-        return {
-          success: false,
-          error: 'E-mail não cadastrado no sistema.',
-          field: 'email',
-        }
+      return {
+        success: false,
+        error: 'E-mail não cadastrado no sistema.',
+        field: 'email',
       }
+    }
 
     const verificationCode = Math.floor(
       100000 + Math.random() * 900000,
@@ -122,7 +120,7 @@ export const signInUserFn = createServerFn({ method: 'POST' })
 
       await cacheProvider.delete(email)
 
-      const user = await findUserByEmail(email)
+      const user = await findUserBy('email', email)
 
       if (!user) {
         return {
@@ -134,21 +132,45 @@ export const signInUserFn = createServerFn({ method: 'POST' })
 
       const jwtProvider = new JwtProvider()
 
-      const token = await jwtProvider.sign(
-        { publicId: user.publicId },
-      )
+      const token = await jwtProvider.sign({ publicId: user.publicId })
 
       setCookie('session_token', token, {
-        httpOnly: true,   
+        httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
         path: '/',
         maxAge: 60 * 60 * 24 * 1,
       })
 
-      return {
-        success: true,
-        data: selectUserSchema.parse(user),
-      }
+      return { success: true, data: selectUserSchema.parse(user) }
     },
   )
+
+export const getProfileFn = createServerFn({ method: 'GET' }).handler(
+  async (): Promise<ActionResult<UserResponse>> => {
+    const session = getCookie('session_token')
+
+    if (!session) {
+      return { success: false, error: 'Credenciais inválidas' }
+    }
+
+    const jwtProvider = new JwtProvider()
+
+    const payload = await jwtProvider.verify(session)
+
+    if (!payload || !payload.publicId) {
+      return { success: false, error: 'Credenciais inválidas' }
+    }
+
+    const user = await findUserBy('publicId', payload.publicId as string)
+
+    if (!user) {
+      return { success: false, error: 'Usuário não encontrado' }
+    }
+
+    return {
+      success: true,
+      data: selectUserSchema.parse(user),
+    }
+  },
+)

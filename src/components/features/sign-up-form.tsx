@@ -22,12 +22,17 @@ import { Input } from '@/components/ui/input'
 import { createUserFn } from '#/services/users'
 import { createUserSchema } from '#/schemas/users'
 import type { CreateUserInput } from '#/schemas/users'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { userQueryOptions } from '#/queries/user'
 
 export function SignUpForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
   const form = useForm<CreateUserInput>({
     resolver: zodResolver(createUserSchema),
     defaultValues: {
@@ -50,7 +55,13 @@ export function SignUpForm({
       return
     }
 
+    queryClient.setQueryData(
+      userQueryOptions.queryKey,
+      result,
+    )
+
     toast.success(`Conta criada com sucesso para ${result.data.name}!`)
+    navigate({ to: '/', replace: true })
   }
 
   return (
@@ -105,7 +116,7 @@ export function SignUpForm({
                     : 'Criar conta'}
                 </Button>
                 <FieldDescription className="text-center mt-2">
-                  Já tem uma conta? <Link to="/sign-in">Fazer login</Link>
+                  Já tem uma conta? <Link to="/auth/sign-in">Fazer login</Link>
                 </FieldDescription>
               </Field>
             </FieldGroup>

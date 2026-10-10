@@ -24,12 +24,16 @@ import { signInUserSchema } from '#/schemas/users'
 import type { SignUserInput } from '#/schemas/users'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { userQueryOptions } from '#/queries/user'
 
 export function SignInForm({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
   const [isSendingOtp, setIsSendingOtp] = React.useState(false)
 
   const form = useForm<SignUserInput>({
@@ -87,7 +91,13 @@ export function SignInForm({
         return
       }
 
+      queryClient.setQueryData(
+      userQueryOptions.queryKey,
+      result,
+    )
+
       toast.success('Login realizado com sucesso!')
+      navigate({ to: '/', replace: true })
     } catch {
       toast.error('Erro ao processar o login.')
     }
@@ -175,7 +185,7 @@ export function SignInForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center mt-2">
-                Não tem uma conta? <Link to="/sign-up">Criar conta</Link>
+                Não tem uma conta? <Link to="/auth/sign-up">Criar conta</Link>
               </FieldDescription>
             </FieldGroup>
           </form>

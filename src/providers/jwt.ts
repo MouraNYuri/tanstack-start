@@ -1,5 +1,5 @@
-import { SignJWT, jwtVerify  } from 'jose'
-import type {JWTPayload} from 'jose';
+import { SignJWT, jwtVerify } from 'jose'
+import type { JWTPayload } from 'jose'
 
 export class JwtProvider {
   private readonly secretKey: Uint8Array
@@ -25,8 +25,14 @@ export class JwtProvider {
       .sign(this.secretKey)
   }
 
-  async verify<T extends JWTPayload = JWTPayload>(token: string): Promise<T> {
-    const { payload } = await jwtVerify(token, this.secretKey)
-    return payload as T
+  async verify<T extends JWTPayload = JWTPayload>(
+    token: string,
+  ): Promise<T | null> {
+    try {
+      const { payload } = await jwtVerify(token, this.secretKey)
+      return payload as T
+    } catch (error) {
+      return null
+    }
   }
 }

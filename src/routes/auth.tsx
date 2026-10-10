@@ -1,12 +1,28 @@
-import { SignInForm } from '#/components/features/sign-in-form'
-import { createFileRoute } from '@tanstack/react-router'
+import { userQueryOptions } from '#/queries/user'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 import { GalleryVerticalEnd } from 'lucide-react'
 
-export const Route = createFileRoute('/sign-in')({
-  component: SignInPage,
+export const Route = createFileRoute('/auth')({
+  beforeLoad: async ({ context, location }) => {
+    const result = await context.queryClient.query(
+      userQueryOptions,
+    )
+
+    if (result.success) {
+      throw redirect({
+        to: '/',
+        search: {
+          redirect: location.href
+        }
+      })
+    }
+
+    return { user: result.data }
+  },
+  component: AuthLayout,
 })
 
-function SignInPage() {
+function AuthLayout() {
   return (
     <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
       <div className="flex w-full max-w-sm flex-col gap-6">
@@ -16,7 +32,7 @@ function SignInPage() {
           </div>
           Acme Inc.
         </a>
-        <SignInForm />
+        <Outlet />
       </div>
     </div>
   )
