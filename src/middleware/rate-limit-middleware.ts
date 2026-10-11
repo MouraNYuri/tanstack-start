@@ -1,4 +1,4 @@
-import { checkRateLimit } from '#/providers/rate-limit'
+import { rateLimiterProvider } from '#/providers'
 import { createMiddleware } from '@tanstack/react-start'
 
 type RateLimitOptions = {
@@ -7,14 +7,18 @@ type RateLimitOptions = {
   timeWindow?: number
 }
 
-export function rateLimitMiddleware({ key, max, timeWindow }: RateLimitOptions) {
+export function rateLimitMiddleware({
+  key,
+  max,
+  timeWindow,
+}: RateLimitOptions) {
   return createMiddleware().server(async ({ next, request }) => {
     const ip =
       request.headers.get('cf-connecting-ip') ??
       request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
       '127.0.0.1'
 
-    const rateLimitResult = checkRateLimit({
+    const rateLimitResult = rateLimiterProvider.check({
       key,
       ip,
       max,

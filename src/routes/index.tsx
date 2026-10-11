@@ -1,16 +1,16 @@
-import { userQueryOptions } from '#/queries/user'
+import { profileQueryOptions } from '#/queries'
 import { useSuspenseQuery } from '@tanstack/react-query'
 import { createFileRoute, Link } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
   loader: async ({ context }) => {
-    await context.queryClient.query(userQueryOptions)
+    await context.queryClient.query(profileQueryOptions)
   },
   component: IndexPage,
 })
 
 function IndexPage() {
-  const { data: profile } = useSuspenseQuery(userQueryOptions)
+  const { data: profile } = useSuspenseQuery(profileQueryOptions)
 
   return (
     <div className="p-6">

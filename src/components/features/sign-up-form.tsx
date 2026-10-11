@@ -19,12 +19,12 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { createUserFn } from '#/services/users'
-import { createUserSchema } from '#/schemas/users'
-import type { CreateUserInput } from '#/schemas/users'
+import { signUpFn } from '#/functions'
+import { createUserSchema } from '#/schemas/user/users-schema'
+import type { CreateUserInput } from '#/schemas/user/users-schema'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import { userQueryOptions } from '#/queries/user'
+import { profileQueryOptions } from '#/queries'
 
 export function SignUpForm({
   className,
@@ -42,7 +42,7 @@ export function SignUpForm({
   })
 
   async function onSubmit(values: CreateUserInput) {
-    const result = await createUserFn({ data: values })
+    const result = await signUpFn({ data: values })
 
     if (!result.success) {
       if (result.field) {
@@ -55,7 +55,7 @@ export function SignUpForm({
       return
     }
 
-    queryClient.setQueryData(userQueryOptions.queryKey, result)
+    queryClient.setQueryData(profileQueryOptions.queryKey, result)
 
     toast.success(`Conta criada com sucesso para ${result.data.name}!`)
     navigate({ to: '/', replace: true })

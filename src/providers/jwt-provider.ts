@@ -1,7 +1,7 @@
 import { SignJWT, jwtVerify } from 'jose'
 import type { JWTPayload } from 'jose'
 
-export class JwtProvider {
+class JwtProvider {
   private readonly secretKey: Uint8Array
 
   constructor() {
@@ -14,7 +14,7 @@ export class JwtProvider {
       expiresIn?: string
       algorithm?: string
     },
-  ): Promise<string> {
+  ) {
     const algorithm = options?.algorithm || 'HS256'
     const expiresIn = options?.expiresIn || '1d'
 
@@ -25,9 +25,7 @@ export class JwtProvider {
       .sign(this.secretKey)
   }
 
-  async verify<T extends JWTPayload = JWTPayload>(
-    token: string,
-  ): Promise<T | null> {
+  async verify<T extends JWTPayload = JWTPayload>(token: string) {
     try {
       const { payload } = await jwtVerify(token, this.secretKey)
       return payload as T
@@ -36,3 +34,5 @@ export class JwtProvider {
     }
   }
 }
+
+export const jwtProvider = new JwtProvider()

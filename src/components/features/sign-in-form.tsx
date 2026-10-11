@@ -19,14 +19,14 @@ import {
   FieldLabel,
 } from '@/components/ui/field'
 import { Input } from '@/components/ui/input'
-import { signInUserFn, verifyEmailFn } from '#/services/users'
-import { signInUserSchema } from '#/schemas/users'
-import type { SignUserInput } from '#/schemas/users'
+import { signInFn, verifyEmailFn } from '#/functions'
+import { signInUserSchema } from '#/schemas/user/users-schema'
+import type { SignUserInput } from '#/schemas/user/users-schema'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '../ui/input-otp'
 import { REGEXP_ONLY_DIGITS } from 'input-otp'
 import { Link, useNavigate } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
-import { userQueryOptions } from '#/queries/user'
+import { profileQueryOptions } from '#/queries'
 
 export function SignInForm({
   className,
@@ -77,7 +77,7 @@ export function SignInForm({
   // Submit final do formulário
   async function onSubmit(values: SignUserInput) {
     try {
-      const result = await signInUserFn({ data: values })
+      const result = await signInFn({ data: values })
 
       if (!result.success) {
         if (result.field) {
@@ -90,7 +90,7 @@ export function SignInForm({
         return
       }
 
-      queryClient.setQueryData(userQueryOptions.queryKey, result)
+      queryClient.setQueryData(profileQueryOptions.queryKey, result)
 
       toast.success('Login realizado com sucesso!')
       navigate({ to: '/', replace: true })

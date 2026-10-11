@@ -1,15 +1,13 @@
+import { users } from '#/db/schema'
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod'
 import { z } from 'zod'
-import { users } from '../db/schema' // Substitua pelo caminho da sua tabela
 
 export const emailSchema = z
   .email({ error: 'Endereço de e-mail inválido' })
   .trim()
   .toLowerCase()
 
-// Schema para Criação de Usuário
 export const createUserSchema = createInsertSchema(users, {
-  // Customização e refino dos campos da tabela
   name: z
     .string({ error: 'O nome é obrigatório' })
     .trim()
@@ -18,15 +16,13 @@ export const createUserSchema = createInsertSchema(users, {
     .toUpperCase(),
   email: emailSchema,
 }).omit({
-  // Omite campos gerenciados automaticamente pelo banco de dados/servidor
   publicId: true,
   createdAt: true,
   updatedAt: true,
 })
 
-// Schema para Seleção/Retorno (Resposta para o Frontend)
 export const selectUserSchema = createSelectSchema(users).omit({
-  id: true, // NUNCA expõe o ID primário privado
+  id: true,
   publicId: true,
   createdAt: true,
   updatedAt: true,

@@ -1,18 +1,17 @@
-const verificationCodes = new Map()
-
-export class CacheProvider {
+class VerificationCodeProvider {
   private cleanupInterval: NodeJS.Timeout | null = null
+  private verificationCodes = new Map()
 
   async set(key: string, value: string, expires: Date): Promise<void> {
-    verificationCodes.set(key, { value, expires })
+    this.verificationCodes.set(key, { value, expires })
   }
 
   async get(key: string): Promise<{ value: string; expires: Date }> {
-    return verificationCodes.get(key)
+    return this.verificationCodes.get(key)
   }
 
   async delete(key: string): Promise<void> {
-    verificationCodes.delete(key)
+    this.verificationCodes.delete(key)
   }
 
   public startCleanup(): void {
@@ -22,9 +21,9 @@ export class CacheProvider {
 
     this.cleanupInterval = setInterval(() => {
       const now = new Date()
-      for (const [key, { expires }] of verificationCodes.entries()) {
+      for (const [key, { expires }] of this.verificationCodes.entries()) {
         if (expires < now) {
-          verificationCodes.delete(key)
+          this.verificationCodes.delete(key)
           console.log(`Expired code for ${key} deleted.`)
         }
       }
@@ -38,3 +37,5 @@ export class CacheProvider {
     }
   }
 }
+
+export const verificationCodeProvider = new VerificationCodeProvider()
