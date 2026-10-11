@@ -17,11 +17,20 @@ function IndexPage() {
       <h1 className="text-2xl font-bold">Painel do Usuário</h1>
       {profile.success && profile.data ? (
         <div className="mt-4 rounded-lg border p-4">
-          <p><strong>Nome:</strong> {profile.data.name}</p>
-          <p><strong>E-mail:</strong> {profile.data.email}</p>
+          <p>
+            <strong>Nome:</strong> {profile.data.name}
+          </p>
+          <p>
+            <strong>E-mail:</strong> {profile.data.email}
+          </p>
         </div>
       ) : (
-        <p>Não foi possível carregar o perfil. <Link className='underline' to='/auth/sign-up'>Ir para o cadastro</Link></p>
+        <p>
+          Não foi possível carregar o perfil.{' '}
+          <Link className="underline" to="/auth/sign-up">
+            Ir para o cadastro
+          </Link>
+        </p>
       )}
     </div>
   )

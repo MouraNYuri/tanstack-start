@@ -4,9 +4,7 @@ import { GalleryVerticalEnd } from 'lucide-react'
 
 export const Route = createFileRoute('/_authLayout')({
   beforeLoad: async ({ context }) => {
-    const result = await context.queryClient.query(
-      userQueryOptions,
-    )
+    const result = await context.queryClient.query(userQueryOptions)
 
     if (result.success) {
       throw redirect({

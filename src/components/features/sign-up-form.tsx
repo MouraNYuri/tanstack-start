@@ -55,10 +55,7 @@ export function SignUpForm({
       return
     }
 
-    queryClient.setQueryData(
-      userQueryOptions.queryKey,
-      result,
-    )
+    queryClient.setQueryData(userQueryOptions.queryKey, result)
 
     toast.success(`Conta criada com sucesso para ${result.data.name}!`)
     navigate({ to: '/', replace: true })

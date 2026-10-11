@@ -13,6 +13,7 @@ import { EmailProvider } from '#/providers/email'
 import { createHtml } from '#/helpers/create-html'
 import { CacheProvider } from '#/providers/cache'
 import { JwtProvider } from '#/providers/jwt'
+import { rateLimitMiddleware } from '#/middleware/rate-limit'
 
 export const createUserFn = createServerFn({ method: 'POST' })
   .validator((data: unknown) => createUserSchema.parse(data))
@@ -53,9 +54,14 @@ export const createUserFn = createServerFn({ method: 'POST' })
   )
 
 export const verifyEmailFn = createServerFn({ method: 'POST' })
+  .middleware([rateLimitMiddleware({ key: 'verifyEmailFn', max: 1, timeWindow: 300000 })])
   .validator((data: unknown) => emailSchema.parse(data))
-  .handler(async ({ data: email }): Promise<ActionResult<string>> => {
-    const user = userExists(email)
+  .handler(async ({ data: email, context }): Promise<ActionResult<string>> => {
+    if (!context.rateLimit.success) {
+      return context.rateLimit
+    }
+
+    const user = await userExists(email)
 
     if (!user) {
       return {
@@ -90,14 +96,18 @@ export const verifyEmailFn = createServerFn({ method: 'POST' })
   })
 
 export const signInUserFn = createServerFn({ method: 'POST' })
+  .middleware([rateLimitMiddleware({ key: 'signInUserFn', max: 3, timeWindow: 100000 })])
   .validator((data: unknown) => signInUserSchema.parse(data))
   .handler(
-    async ({ data: { email, otp } }): Promise<ActionResult<UserResponse>> => {
+    async ({ data: { email, otp }, context }): Promise<ActionResult<UserResponse>> => {
+      if (!context.rateLimit.success) {
+      return context.rateLimit
+    }
       const cacheProvider = new CacheProvider()
 
       const thereAVerificationCode = await cacheProvider.get(email)
 
-      if (!thereAVerificationCode) {
+      if (!thereAVerificationCode.value) {
         return {
           success: false,
           error: 'Não existe um código de verificação para esse e-mail',

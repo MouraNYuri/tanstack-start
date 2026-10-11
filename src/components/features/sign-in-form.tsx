@@ -68,7 +68,6 @@ export function SignInForm({
 
       toast.success(result.data || 'Código de acesso enviado para seu e-mail!')
     } catch (err) {
-      console.log(err)
       toast.error('Erro inesperado ao enviar o e-mail de acesso.')
     } finally {
       setIsSendingOtp(false)
@@ -91,10 +90,7 @@ export function SignInForm({
         return
       }
 
-      queryClient.setQueryData(
-      userQueryOptions.queryKey,
-      result,
-    )
+      queryClient.setQueryData(userQueryOptions.queryKey, result)
 
       toast.success('Login realizado com sucesso!')
       navigate({ to: '/', replace: true })
