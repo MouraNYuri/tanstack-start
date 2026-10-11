@@ -46,8 +46,8 @@ export const verifyEmailFn = createServerFn({ method: 'POST' })
 
     if (!result.success) {
       return {
-        success: true,
-        data: result.error,
+        success: false,
+        error: result.error,
       }
     }
 
