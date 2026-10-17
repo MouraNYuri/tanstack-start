@@ -94,7 +94,8 @@ export function SignInForm({
 
       toast.success('Login realizado com sucesso!')
       navigate({ to: '/', replace: true })
-    } catch {
+    } catch (err) {
+      console.log(err)
       toast.error('Erro ao processar o login.')
     }
   }

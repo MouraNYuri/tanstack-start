@@ -18,7 +18,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
+import { signOutFn } from '#/functions'
+import { toast } from 'sonner'
 
 type AvatarMenuProps = {
   name: string
@@ -26,6 +29,19 @@ type AvatarMenuProps = {
 }
 
 export function AvatarMenu({ name, email }: AvatarMenuProps) {
+  const queryClient = useQueryClient()
+  const navigation = useNavigate()
+
+  const handleSignOut = async () => {
+    const result = await signOutFn()
+
+    if (result.success) {
+      await queryClient.invalidateQueries({ queryKey: ['profile'] })
+      navigation({ to: '/' })
+      toast.success(result.data)
+    }
+  }
+
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -88,9 +104,11 @@ export function AvatarMenu({ name, email }: AvatarMenuProps) {
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>
-          <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
-          <span>Sair</span>
+        <DropdownMenuItem asChild>
+          <button className="w-full" type="button" onClick={handleSignOut}>
+            <LogOutIcon size={16} className="opacity-60" aria-hidden="true" />
+            Sair
+          </button>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

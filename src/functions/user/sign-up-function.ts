@@ -9,7 +9,7 @@ import { setCookie } from '@tanstack/react-start/server'
 
 export const signUpFn = createServerFn({ method: 'POST' })
   .middleware([
-    rateLimitMiddleware({ key: 'signUpUserFn', max: 1, timeWindow: 300000 }),
+    rateLimitMiddleware({ key: 'signUpFn', max: 1, timeWindow: 300000 }),
   ])
   .validator((data: unknown) => createUserSchema.parse(data))
   .handler(

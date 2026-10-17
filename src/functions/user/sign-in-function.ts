@@ -9,7 +9,7 @@ import { setCookie } from '@tanstack/react-start/server'
 
 export const signInFn = createServerFn({ method: 'POST' })
   .middleware([
-    rateLimitMiddleware({ key: 'signInUserFn', max: 3, timeWindow: 100000 }),
+    rateLimitMiddleware({ key: 'signInFn', max: 3, timeWindow: 100000 }),
   ])
   .validator((data: unknown) => signInUserSchema.parse(data))
   .handler(
@@ -22,7 +22,7 @@ export const signInFn = createServerFn({ method: 'POST' })
       }
       const thereAVerificationCode = await verificationCodeProvider.get(email)
 
-      if (!thereAVerificationCode.value) {
+      if (!thereAVerificationCode) {
         return {
           success: false,
           error: 'Não existe um código de verificação para esse e-mail',
