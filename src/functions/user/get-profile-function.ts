@@ -1,8 +1,8 @@
 import { rateLimitMiddleware } from '#/middleware/rate-limit-middleware'
 import { jwtProvider } from '#/providers'
 import { userRepository } from '#/repositories'
-import { selectUserSchema  } from '#/schemas'
-import type {UserResponse} from '#/schemas';
+import { selectUserSchema } from '#/schemas'
+import type { UserResponse } from '#/schemas'
 import type { ActionResult } from '#/types/action-result'
 import { createServerFn } from '@tanstack/react-start'
 import { getCookie } from '@tanstack/react-start/server'

@@ -1,12 +1,8 @@
 import { rateLimitMiddleware } from '#/middleware/rate-limit-middleware'
 import { jwtProvider, verificationCodeProvider } from '#/providers'
 import { userRepository } from '#/repositories'
-import {
-  selectUserSchema,
-  signInUserSchema
-  
-} from '#/schemas'
-import type {UserResponse} from '#/schemas';
+import { selectUserSchema, signInUserSchema } from '#/schemas'
+import type { UserResponse } from '#/schemas'
 import type { ActionResult } from '#/types/action-result'
 import { createServerFn } from '@tanstack/react-start'
 import { setCookie } from '@tanstack/react-start/server'
